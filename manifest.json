@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "ParsiLaTeXCodeSave",
+  "version": "0.1",
+  "author": "Javad Razavian",
+
+  "description": "Double click inside a code chunk to copy it to the clipboard.",
+
+  "icons": {
+    "48": "icons/icon48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://qa.parsilatex.com/*"],
+      "js": ["jquery-3.3.1.min.js", "sectoc.js"],
+      "css": ["sectoc.css"]
+    }
+  ]
+}
