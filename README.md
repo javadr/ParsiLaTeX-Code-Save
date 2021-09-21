@@ -1,5 +1,6 @@
 # ParsiLaTeX Code Save
-A Firefox ADD-ONS which saves the code section of the [ParsiLaTeX](qa.parsilatex.com) by double-clicking 
+A Firefox ADD-ONS which saves the code section of the [ParsiLaTeX](qa.parsilatex.com) by double-clicking.
+It also supports StackExchange Network.
 
 # Introduction
 
