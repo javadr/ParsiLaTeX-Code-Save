@@ -11,8 +11,10 @@
     },
 
     "content_scripts": [{
-        "matches": ["*://qa.parsilatex.com/*", 
-        	"*://*.stackexchange.com/*", "*://stackoverflow.com/*",  "*://*.stackoverflow.com/*"],
+        "matches": ["*://qa.parsilatex.com/*",
+                    "*://*.stackexchange.com/*", "*://stackoverflow.com/*",
+                    "*://*.stackoverflow.com/*"
+                ],
         "js": ["jquery-3.3.1.min.js", "sectoc.js"],
         "css": ["sectoc.css"]
     }]
