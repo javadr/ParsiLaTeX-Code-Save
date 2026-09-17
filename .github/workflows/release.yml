@@ -5,6 +5,13 @@ on:
     branches: [main]
     paths:
       - 'src/manifest.json'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Rebuild and overwrite the release even if the tag already exists'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -29,20 +36,32 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Building version: $VERSION"
 
-      - name: Skip unless the version was bumped in this push
+      - name: Decide whether to release
         id: gate
+        env:
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.force == 'true' }}
         run: |
-          OLD_VERSION=$(git show HEAD^:src/manifest.json | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])")
           NEW_VERSION='${{ steps.version.outputs.version }}'
           if git rev-parse -q --verify "refs/tags/v$NEW_VERSION" >/dev/null; then
-            echo "Tag v$NEW_VERSION already exists — skipping."
-            echo "release=false" >> "$GITHUB_OUTPUT"
-          elif [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
-            echo "Version bumped: $OLD_VERSION -> $NEW_VERSION"
-            echo "release=true" >> "$GITHUB_OUTPUT"
+            if [ "$FORCE" = "true" ]; then
+              echo "Tag v$NEW_VERSION exists but force is set — re-releasing."
+              echo "release=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "Tag v$NEW_VERSION already exists — skipping."
+              echo "release=false" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            OLD_VERSION=$(git show HEAD^:src/manifest.json | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])")
+            if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+              echo "Version bumped: $OLD_VERSION -> $NEW_VERSION"
+              echo "release=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "Version unchanged in this push — skipping."
+              echo "release=false" >> "$GITHUB_OUTPUT"
+            fi
           else
-            echo "Version unchanged in this push — skipping."
-            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "Manual run for v$NEW_VERSION — releasing."
+            echo "release=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build XPI (same as `make xpi`)
@@ -65,3 +84,4 @@ jobs:
           files: web-ext-artifacts/parsilatex-code-save-*.xpi
           fail_on_unmatched_files: true
           generate_release_notes: true
+          update_release_body: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.force == 'true' }}
