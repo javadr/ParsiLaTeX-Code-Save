@@ -1,3 +1,7 @@
+.parsilatex-code-save-hover {
+    outline: 2px solid currentColor;
+}
+
 .soctoc {
     opacity: 1;
     -webkit-animation: copy 1s;

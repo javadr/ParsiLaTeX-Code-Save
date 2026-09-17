@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "ParsiLaTeX Code Save",
-    "version": "0.2",
+    "version": "0.2.1",
     "author": "Javad Razavian",
 
     "description": "Double click inside a code chunk to copy it to the clipboard.",
