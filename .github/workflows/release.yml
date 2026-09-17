@@ -1,0 +1,67 @@
+name: Release XPI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/manifest.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-xpi
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Read version from manifest
+        id: version
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('src/manifest.json'))['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Building version: $VERSION"
+
+      - name: Skip unless the version was bumped in this push
+        id: gate
+        run: |
+          OLD_VERSION=$(git show HEAD^:src/manifest.json | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])")
+          NEW_VERSION='${{ steps.version.outputs.version }}'
+          if git rev-parse -q --verify "refs/tags/v$NEW_VERSION" >/dev/null; then
+            echo "Tag v$NEW_VERSION already exists — skipping."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          elif [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            echo "Version bumped: $OLD_VERSION -> $NEW_VERSION"
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version unchanged in this push — skipping."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build XPI (same as `make xpi`)
+        if: steps.gate.outputs.release == 'true'
+        run: |
+          mkdir -p web-ext-artifacts
+          XPI="web-ext-artifacts/parsilatex-code-save-${{ steps.version.outputs.version }}.xpi"
+          rm -f "$XPI"
+          cd src && zip -r -FS "../$XPI" \
+            manifest.json sectoc.js sectoc.css jquery-3.3.1.min.js icons
+          cd ..
+          unzip -l "$XPI"
+
+      - name: Create GitHub release
+        if: steps.gate.outputs.release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: ParsiLaTeX Code Save v${{ steps.version.outputs.version }}
+          files: web-ext-artifacts/parsilatex-code-save-*.xpi
+          fail_on_unmatched_files: true
+          generate_release_notes: true
