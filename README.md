@@ -11,6 +11,28 @@ It also supports StackExchange Network.
 
 Go to [ParsiLaTeX Code Save ADD-ONS page](https://addons.mozilla.org/en-US/firefox/addon/parsilatex-code-save/) and click on **Add to Firefox** button. . 
 
+# Using the extension in Firefox
+
+- **Recommended**: install the signed add-on from the [AMO page](https://addons.mozilla.org/en-US/firefox/addon/parsilatex-code-save/) linked above.
+- **From a GitHub release**: download `parsilatex-code-save-<version>.xpi` from the [Releases page](https://github.com/javadr/ParsiLaTeX-Code-Save/releases). These builds are **unsigned**, so on stable Firefox you cannot install them directly; either:
+  - use Firefox **Developer Edition / Nightly / ESR** and set `xpinstall.signatures.required` to `false` in `about:config`, then drag the `.xpi` onto `about:addons`, or
+  - open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and select `src/manifest.json` — no signing needed, but the add-on disappears when Firefox is closed.
+- **Build it yourself**: run `make xpi` in this directory to produce `web-ext-artifacts/parsilatex-code-save-<version>.xpi`, then install it as above.
+
+# Using the extension in Chrome / Chromium (Chrome, Edge, Brave, Vivaldi)
+
+Chrome cannot install the Firefox `.xpi` directly — load the unpacked source instead:
+
+1. Open `chrome://extensions`.
+2. Enable **Developer mode** (top-right toggle).
+3. Click **Load unpacked** and select the `src/` folder from this repository.
+4. Open a site listed under `content_scripts.matches` in `src/manifest.json` (e.g. `parsilatex.com` or any StackExchange site) and double-click a code block to copy it.
+
+Notes:
+- Chrome silently ignores the `browser_specific_settings` block, so the same `src/` folder works in both browsers.
+- A loaded-unpacked extension stays active after a Chrome restart as long as the folder is not moved or deleted.
+- The extension is Manifest V3, so it also works in other Chromium-based browsers the same way. 
+
 
 # Courtesy to [Martin Schmelzer](https://addons.mozilla.org/en-US/firefox/user/13904961/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_content=addons-manager-user-profile-link)
 This code is a fork from [StackExchange Copy to Clipboard](https://addons.mozilla.org/en-US/firefox/addon/stackexchangecopytoclipboard/) with just some modifications. 
