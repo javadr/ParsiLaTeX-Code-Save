@@ -5,6 +5,7 @@ MANIFEST   := $(SRC_DIR)/manifest.json
 VERSION    := $(shell python3 -c "import json; print(json.load(open('$(MANIFEST)'))['version'])")
 XPI         := $(BUILD_DIR)/$(ADDON_NAME)-$(VERSION).xpi
 SOURCE_ZIP  := $(BUILD_DIR)/$(ADDON_NAME)-$(VERSION)-source.zip
+CHROME_ZIP  := $(BUILD_DIR)/$(ADDON_NAME)-$(VERSION)-chrome.zip
 
 SOURCES := $(SRC_DIR)/manifest.json \
            $(SRC_DIR)/sectoc.js \
@@ -17,9 +18,9 @@ SOURCE_FILES := $(SOURCES) \
            LICENSE \
            Makefile
 
-.PHONY: all xpi source lint build sign clean check help
+.PHONY: all xpi source chrome lint build sign clean check help
 
-all: xpi source
+all: xpi source chrome
 
 # Default: package a Firefox-installable .xpi with plain `zip`
 # (no npm / web-ext required). Excludes git metadata and build dir itself.
@@ -44,12 +45,27 @@ $(SOURCE_ZIP): $(SOURCE_FILES)
 	@echo "Built $(SOURCE_ZIP)"
 	@unzip -l $(SOURCE_ZIP)
 
+# Chrome Web Store package. Identical payload to the xpi but named *.zip
+# and with files at the archive root, as the Web Store requires.
+# (source: the xpi's own contents would also work, but a plain zip of src/
+#  keeps manifest.json at the root.)
+chrome: $(CHROME_ZIP)
+
+$(CHROME_ZIP): $(SOURCES)
+	mkdir -p $(BUILD_DIR)
+	rm -f $(CHROME_ZIP)
+	cd $(SRC_DIR) && zip -r -FS ../$(BUILD_DIR)/$(notdir $(CHROME_ZIP)) \
+		manifest.json sectoc.js sectoc.css jquery-3.3.1.min.js icons
+	@echo "Built $(CHROME_ZIP)"
+	@unzip -l $(CHROME_ZIP)
+
 # Validate file list + show what would be packaged
 check:
 	@for f in $(SOURCE_FILES); do test -f "$$f" || (echo "MISSING: $$f"; exit 1); done
 	@echo "version: $(VERSION)"
 	@echo "xpi:     $(XPI)"
 	@echo "source:  $(SOURCE_ZIP)"
+	@echo "chrome:  $(CHROME_ZIP)"
 	@python3 -c "import json; json.load(open('$(MANIFEST)')); print('manifest.json: valid JSON')"
 
 # Requires: npm install --global web-ext
@@ -74,9 +90,10 @@ clean:
 
 help:
 	@echo "Targets:"
-	@echo "  make / make all     Build $(XPI) and $(SOURCE_ZIP)"
+	@echo "  make / make all     Build xpi, source zip and chrome zip"
 	@echo "  make xpi            Build $(XPI) with plain zip (no deps)"
 	@echo "  make source         Build $(SOURCE_ZIP) for AMO source review"
+	@echo "  make chrome         Build $(CHROME_ZIP) for Chrome Web Store"
 	@echo "  make check          Validate manifest + file list"
 	@echo "  make lint           web-ext lint (needs web-ext)"
 	@echo "  make build          web-ext build (needs web-ext)"
