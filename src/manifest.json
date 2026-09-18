@@ -1,12 +1,15 @@
 {
     "manifest_version": 3,
     "name": "ParsiLaTeX Code Save",
-    "version": "0.2.2",
+    "version": "0.2.4",
     "author": "Javad Razavian",
 
     "browser_specific_settings": {
         "gecko": {
-            "id": "{89d53735-3200-44f9-bba5-f775ad061b53}"
+            "id": "{9ccf0f94-0133-468d-8803-b55d6781cc79}",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
         }
     },
 
