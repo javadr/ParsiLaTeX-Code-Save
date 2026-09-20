@@ -11,7 +11,8 @@ SOURCES := $(SRC_DIR)/manifest.json \
            $(SRC_DIR)/sectoc.js \
            $(SRC_DIR)/sectoc.css \
            $(SRC_DIR)/jquery-3.3.1.min.js \
-           $(SRC_DIR)/icons/icon48.png
+           $(SRC_DIR)/icons/icon48.png \
+           $(SRC_DIR)/icons/icon128.png
 
 SOURCE_FILES := $(SOURCES) \
            README.md \

@@ -16,7 +16,8 @@
     "description": "Double click inside a code chunk to copy it to the clipboard.",
 
     "icons": {
-        "48": "icons/icon48.png"
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
     },
 
     "content_scripts": [{

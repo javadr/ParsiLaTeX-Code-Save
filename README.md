@@ -9,7 +9,8 @@ It also supports StackExchange Network.
 
 # Installation
 
-Go to [ParsiLaTeX Code Save ADD-ONS page](https://addons.mozilla.org/en-US/firefox/addon/parsilatex-code-save/) and click on **Add to Firefox** button. . 
+- **Firefox**: go to the [ParsiLaTeX Code Save ADD-ONS page](https://addons.mozilla.org/en-US/firefox/addon/parsilatex-code-save/) and click on **Add to Firefox**.
+- **Chrome**: go to the [ParsiLaTeX Code Save page on the Chrome Web Store](https://chromewebstore.google.com/detail/parsilatex-code-save/edaclfjppagddmnhmkkiphbmjkcgklha) and click on **Add to Chrome**. 
 
 # Using the extension in Firefox
 
