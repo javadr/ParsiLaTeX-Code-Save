@@ -4,16 +4,16 @@
 
 .soctoc {
     opacity: 1;
-    -webkit-animation: copy 1s;
     animation: copy 1s;
-}
-
-@-webkit-keyframes copy {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0; }
 }
 
 @keyframes copy {
     0%, 50%, 100% { opacity: 1; }
     25%, 75% { opacity: 0; }
+}
+
+/* Declared after the hover rule so a failed copy stays visible while the
+   pointer is still over the chunk. */
+.parsilatex-code-save-failed {
+    outline: 2px dashed currentColor;
 }

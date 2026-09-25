@@ -1,3 +1,6 @@
 .gitignore
 .web-extension-id
 web-ext-artifacts
+web-ext-artifacts.old
+.claude/
+.serena/

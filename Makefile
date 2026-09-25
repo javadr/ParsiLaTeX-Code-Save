@@ -7,12 +7,19 @@ XPI         := $(BUILD_DIR)/$(ADDON_NAME)-$(VERSION).xpi
 SOURCE_ZIP  := $(BUILD_DIR)/$(ADDON_NAME)-$(VERSION)-source.zip
 CHROME_ZIP  := $(BUILD_DIR)/$(ADDON_NAME)-$(VERSION)-chrome.zip
 
+# Single source of truth for what ships. Both zip recipes below derive their
+# file list from this (see PAYLOAD), so a new file only has to be added here.
 SOURCES := $(SRC_DIR)/manifest.json \
            $(SRC_DIR)/sectoc.js \
            $(SRC_DIR)/sectoc.css \
-           $(SRC_DIR)/jquery-3.3.1.min.js \
            $(SRC_DIR)/icons/icon48.png \
            $(SRC_DIR)/icons/icon128.png
+
+# Paths as they must appear inside the archives: no $(SRC_DIR)/ prefix (the zip
+# runs from inside src/, which keeps manifest.json at the archive root) and the
+# icons/ directory rather than the individual icon files.
+ICONS_DIR := icons
+PAYLOAD   := $(patsubst $(SRC_DIR)/%,%,$(filter-out $(SRC_DIR)/$(ICONS_DIR)/%,$(SOURCES))) $(ICONS_DIR)
 
 SOURCE_FILES := $(SOURCES) \
            README.md \
@@ -30,12 +37,13 @@ xpi: $(XPI)
 $(XPI): $(SOURCES)
 	mkdir -p $(BUILD_DIR)
 	rm -f $(XPI)
-	cd $(SRC_DIR) && zip -r -FS ../$(BUILD_DIR)/$(notdir $(XPI)) \
-		manifest.json sectoc.js sectoc.css jquery-3.3.1.min.js icons
+	cd $(SRC_DIR) && zip -r -FS ../$(BUILD_DIR)/$(notdir $(XPI)) $(PAYLOAD)
 	@echo "Built $(XPI)"
 	@unzip -l $(XPI)
 
-# Source archive required by AMO when shipping minified code (jquery).
+# Source archive for AMO reviewers. It is only mandatory when minified or
+# obfuscated code ships, which nothing does since jQuery was dropped, but it
+# costs nothing and answers a reviewer's request in one command.
 # Keeps the repo layout (src/ + root docs) so reviewers can follow it.
 source: $(SOURCE_ZIP)
 
@@ -55,8 +63,7 @@ chrome: $(CHROME_ZIP)
 $(CHROME_ZIP): $(SOURCES)
 	mkdir -p $(BUILD_DIR)
 	rm -f $(CHROME_ZIP)
-	cd $(SRC_DIR) && zip -r -FS ../$(BUILD_DIR)/$(notdir $(CHROME_ZIP)) \
-		manifest.json sectoc.js sectoc.css jquery-3.3.1.min.js icons
+	cd $(SRC_DIR) && zip -r -FS ../$(BUILD_DIR)/$(notdir $(CHROME_ZIP)) $(PAYLOAD)
 	@echo "Built $(CHROME_ZIP)"
 	@unzip -l $(CHROME_ZIP)
 
@@ -64,6 +71,7 @@ $(CHROME_ZIP): $(SOURCES)
 check:
 	@for f in $(SOURCE_FILES); do test -f "$$f" || (echo "MISSING: $$f"; exit 1); done
 	@echo "version: $(VERSION)"
+	@echo "payload: $(PAYLOAD)"
 	@echo "xpi:     $(XPI)"
 	@echo "source:  $(SOURCE_ZIP)"
 	@echo "chrome:  $(CHROME_ZIP)"

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ParsiLaTeX Code Save",
-    "version": "0.2.4",
+    "version": "0.2.6",
     "author": "Javad Razavian",
 
     "browser_specific_settings": {
@@ -22,10 +22,15 @@
 
     "content_scripts": [{
         "matches": ["*://qa.parsilatex.com/*",
-                    "*://*.stackexchange.com/*", "*://stackoverflow.com/*",
-                    "*://*.stackoverflow.com/*"
+                    "*://*.stackexchange.com/*",
+                    "*://*.stackoverflow.com/*",
+                    "*://*.askubuntu.com/*",
+                    "*://*.superuser.com/*",
+                    "*://*.serverfault.com/*",
+                    "*://*.mathoverflow.net/*",
+                    "*://*.stackapps.com/*"
                 ],
-        "js": ["jquery-3.3.1.min.js", "sectoc.js"],
+        "js": ["sectoc.js"],
         "css": ["sectoc.css"]
     }]
 }

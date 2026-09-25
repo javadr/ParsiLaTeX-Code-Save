@@ -67,13 +67,8 @@ jobs:
       - name: Build XPI (same as `make xpi`)
         if: steps.gate.outputs.release == 'true'
         run: |
-          mkdir -p web-ext-artifacts
-          XPI="web-ext-artifacts/parsilatex-code-save-${{ steps.version.outputs.version }}.xpi"
-          rm -f "$XPI"
-          cd src && zip -r -FS "../$XPI" \
-            manifest.json sectoc.js sectoc.css jquery-3.3.1.min.js icons
-          cd ..
-          unzip -l "$XPI"
+          make xpi
+          unzip -l "web-ext-artifacts/parsilatex-code-save-${{ steps.version.outputs.version }}.xpi"
 
       - name: Create GitHub release
         if: steps.gate.outputs.release == 'true'
